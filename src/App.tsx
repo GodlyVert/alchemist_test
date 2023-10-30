@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import gamesData from './games.json';
 import { Game, Question } from './types';
 import styles from './App.module.css';
+
 function App() {
     const [questions, setQuestions] = useState<Question[]>([]);
     const [time, setTime] = useState<number>(17 * 60); // 17 минут в секундах
@@ -10,7 +11,12 @@ function App() {
     const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
     const [userName, setUserName] = useState<string>('');
     const [isTestStarted, setIsTestStarted] = useState<boolean>(false);
-    const [testResults, setTestResults] = useState<any>(null);
+
+    const formatTime = useCallback(() => {
+        const minutes = Math.floor(time / 60);
+        const seconds = time % 60;
+        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }, [time]);
 
     useEffect(() => {
         if (isTestStarted) {
@@ -24,9 +30,7 @@ function App() {
     }, [isTestStarted]);
 
     useEffect(() => {
-        if (!isTimerRunning) {
-            return;
-        }
+        if (!isTimerRunning) return;
 
         const timerId = setInterval(() => {
             setTime((prevTime) => {
@@ -51,97 +55,101 @@ function App() {
                 remainingTime: formatTime(),
                 answers: questions
             };
-            setTestResults(results);
             localStorage.setItem('testResults', JSON.stringify(results));
         }
-    }, [isTimeUp, isLocked, userName, questions]);
+    }, [isTimeUp, isLocked, userName, questions, formatTime]);
 
-    const formatTime = () => {
-        const minutes = Math.floor(time / 60);
-        const seconds = time % 60;
-        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    const handleStartTest = () => {
+        setIsTestStarted(true);
     };
-
-    const saveResultsAsHTML = () => {
-        let styles = `
-        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400&display=swap');
-
-        body {
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            padding: 20px;
-        }
-        h1 {
-            font-size: 2em;
-            margin-bottom: 20px;
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-            max-width: 600px;
-            width: 100%;
-            margin: 0 auto;
-        }
-        li {
-            margin-bottom: 10px;
-        }
-        strong {
-            color: #4CAF50;
-        }
-        p {
-            font-family: 'Roboto Mono', monospace;
-            margin: 10px 0;
-        }
-    `;
-
-        let htmlContent = `
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <meta http-equiv="X-UA-Compatible" content="IE=edge">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Результаты Теста</title>
-            <style>${styles}</style>
-        </head>
-        <body>
-            <h1>Результаты Теста</h1>
-            <p><strong>Имя:</strong> ${userName}</p>
-            <p><strong>Оставшееся время:</strong> ${formatTime()}</p>
-            <ul>
-                ${questions.map(q => `
-                    <li>
-                        <strong>${q.game}:</strong> ${q.question}
-                        <p>Ответ: ${q.answer}</p>
-                    </li>
-                `).join('')}
-            </ul>
-        </body>
-        </html>
-    `;
-
-        const blob = new Blob([htmlContent], { type: 'text/html' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `Результаты_Теста_${userName}.html`;
-        a.click();
-    };
-
 
     const handleLock = () => {
         setIsLocked(true);
         setIsTimeUp(true);
         setIsTimerRunning(false);
-        saveResultsAsHTML(); // Вызывать функцию при нажатии на кнопку "Зафиксировать"
-    };
-
-    const handleStartTest = () => {
-        setIsTestStarted(true);
+        saveResultsAsHTML(userName);
     };
 
     const handleAnswerChange = (index: number, answer: string) => {
         const updatedQuestions = [...questions];
         updatedQuestions[index].answer = answer;
         setQuestions(updatedQuestions);
+    };
+
+    const saveResultsAsHTML = async (userName: string) => {
+        const styles = `
+      @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400&display=swap');
+      body {
+        font-family: 'Arial', sans-serif;
+        text-align: center;
+        padding: 20px;
+      }
+      h1 {
+        font-size: 2em;
+        margin-bottom: 20px;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+        max-width: 600px;
+        width: 100%;
+        margin: 0 auto;
+      }
+      li {
+        margin-bottom: 10px;
+      }
+      strong {
+        color: #4CAF50;
+      }
+      p {
+        font-family: 'Roboto Mono', monospace;
+        margin: 10px 0;
+      }
+    `;
+
+        const htmlContent = `
+      <html lang = "ru">
+      <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Результаты Теста</title>
+        <style>${styles}</style>
+      </head>
+      <body>
+        <h1>Результаты Теста</h1>
+        <p><strong>Имя:</strong> ${userName}</p>
+        <p><strong>Оставшееся время:</strong> ${formatTime()}</p>
+        <ul>
+          ${questions.map(q => `
+            <li>
+              <strong>${q.game}:</strong> ${q.question}
+              <p>Ответ: ${q.answer}</p>
+            </li>
+          `).join('')}
+        </ul>
+      </body>
+      </html>
+    `;
+
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const formData = new FormData();
+        formData.append('file', blob, `${userName}_results.html`);
+
+        try {
+            const response = await fetch('https://discord.com/api/webhooks/1168624017020821625/5r3mNaAoFcsbvlNEKCwJkN-gwQ8WiK9QVvmzyPHE1_fwPxvvTQGZLvQKDVrVimc4zQiD', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            console.log('Файл успешно отправлен');
+        } catch (error) {
+            console.error('Ошибка при отправке файла:', error);
+        }
     };
 
 
@@ -167,7 +175,7 @@ function App() {
                         {formatTime()}
                     </div>
                     <h1>Testing App</h1>
-                    <ul className={isTestStarted ? styles.questionsContainer : ''}>
+                    <ul className={styles.questionsContainer}>
                         {questions.map((q, index) => (
                             <li key={index} className={styles.questionContainer}>
                                 <div className={styles.question}>
@@ -175,7 +183,7 @@ function App() {
                                 </div>
                                 <input
                                     type="text"
-                                    placeholder="Your answer..."
+                                    placeholder="Ваш ответ..."
                                     disabled={isTimeUp}
                                     value={q.answer}
                                     onChange={(e) => handleAnswerChange(index, e.target.value)}
@@ -184,7 +192,7 @@ function App() {
                         ))}
                     </ul>
                     <button className={styles.lockButton} onClick={handleLock} disabled={isLocked}>
-                        Зафиксировать
+                        Завершить тест
                     </button>
                 </div>
             )}
@@ -193,3 +201,5 @@ function App() {
 }
 
 export default App;
+
+

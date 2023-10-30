@@ -73,12 +73,16 @@ input:focus {
 }
 
 .timer {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    font-size: 1.5em;
-    font-family: 'Roboto Mono', monospace;
+    position: fixed; /* Зафиксированное положение */
+    top: 10px;       /* Отступ сверху */
+    right: 10px;     /* Отступ справа */
+    font-size: 20px; /* Размер шрифта, можно настроить по вашему усмотрению */
+    background: rgba(0, 0, 0, 0.7); /* Черный фон с небольшой прозрачностью */
+    color: #fff;     /* Белый цвет текста */
+    padding: 10px;   /* Внутренние отступы */
+    border-radius: 5px; /* Скругленные углы */
 }
+
 
 .lockButton {
     padding: 10px 20px;
