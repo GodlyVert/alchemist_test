@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/alchemist_test/static/css/main.5fc41762.css",
-    "main.js": "/alchemist_test/static/js/main.ff738061.js",
+    "main.css": "/alchemist_test/static/css/main.dbf40308.css",
+    "main.js": "/alchemist_test/static/js/main.f1e423e2.js",
     "static/js/787.1d6b376e.chunk.js": "/alchemist_test/static/js/787.1d6b376e.chunk.js",
     "index.html": "/alchemist_test/index.html",
-    "main.5fc41762.css.map": "/alchemist_test/static/css/main.5fc41762.css.map",
-    "main.ff738061.js.map": "/alchemist_test/static/js/main.ff738061.js.map",
+    "main.dbf40308.css.map": "/alchemist_test/static/css/main.dbf40308.css.map",
+    "main.f1e423e2.js.map": "/alchemist_test/static/js/main.f1e423e2.js.map",
     "787.1d6b376e.chunk.js.map": "/alchemist_test/static/js/787.1d6b376e.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.5fc41762.css",
-    "static/js/main.ff738061.js"
+    "static/css/main.dbf40308.css",
+    "static/js/main.f1e423e2.js"
   ]
 }
