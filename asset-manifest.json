@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/alchemist_test/static/css/main.c80545cc.css",
+    "main.js": "/alchemist_test/static/js/main.03a2f057.js",
+    "static/js/787.1d6b376e.chunk.js": "/alchemist_test/static/js/787.1d6b376e.chunk.js",
+    "index.html": "/alchemist_test/index.html",
+    "main.c80545cc.css.map": "/alchemist_test/static/css/main.c80545cc.css.map",
+    "main.03a2f057.js.map": "/alchemist_test/static/js/main.03a2f057.js.map",
+    "787.1d6b376e.chunk.js.map": "/alchemist_test/static/js/787.1d6b376e.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c80545cc.css",
+    "static/js/main.03a2f057.js"
+  ]
+}
