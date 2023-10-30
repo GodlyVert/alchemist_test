@@ -164,7 +164,11 @@ function App() {
                             value={userName}
                             onChange={(e) => setUserName(e.target.value)}
                         />
-                        <button onClick={handleStartTest} disabled={!userName}>
+                        <button
+                            className={`${styles.startButton}`}
+                            onClick={handleStartTest}
+                            disabled={!userName}
+                        >
                             Начать тест
                         </button>
                     </div>
