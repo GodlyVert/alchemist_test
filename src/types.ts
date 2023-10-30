@@ -1,11 +1,12 @@
-export interface Game {
+export type Game = {
     game: string;
-    questions: string[];
-}
+    questions: Array<{ question: string, answer: string }>;
+};
 
-export interface Question {
+
+export type Question = {
     game: string;
     question: string;
-    answer?: string;
-}
-
+    answer: string;
+    correctAnswer: string;
+};

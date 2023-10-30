@@ -22,12 +22,19 @@ function App() {
         if (isTestStarted) {
             const selectedQuestions = gamesData.map((game: Game) => {
                 const randomIndex = Math.floor(Math.random() * game.questions.length);
-                return { game: game.game, question: game.questions[randomIndex], answer: '' };
+                return {
+                    game: game.game,
+                    question: game.questions[randomIndex].question,
+                    correctAnswer: game.questions[randomIndex].answer,
+                    answer: ''
+                };
             });
             setQuestions(selectedQuestions);
             setIsTimerRunning(true);
         }
     }, [isTestStarted]);
+
+
 
     useEffect(() => {
         if (!isTimerRunning) return;
@@ -113,6 +120,17 @@ function App() {
     font-family: 'Roboto Mono', monospace;
     margin: 0;
   }
+  .strongGreen {
+  color: #4CAF50;
+}
+select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-family: 'Roboto Mono', monospace;
+}
+
 `;
 
         const htmlContent = `
@@ -131,18 +149,37 @@ function App() {
       <div><strong>Оставшееся время:</strong> ${formatTime()}</div>
     </div>
     <ul>
-      ${questions.map(q => `
+      ${questions.map((q, index) => `
         <li class="question-block">
-          <strong>${q.game}:</strong> ${q.question}
-          <p>Ответ: ${q.answer}</p>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong class="strongGreen">${q.game}:</strong> ${q.question}
+            </div>
+            <select id="score${index}" onchange="calculateTotal()">
+              <option value="0">0</option>
+              <option value="0.5">0,5</option>
+              <option value="0.75">0,75</option>
+              <option value="1">1</option>
+            </select>
+          </div>
+          <p><strong class="strongGreen">Ответ:</strong> ${q.answer}</p>
+          <p><strong class="strongGreen">Правильный ответ:</strong> ${q.correctAnswer}</p>
         </li>
       `).join('')}
     </ul>
+    <div id="totalScore" style="margin-top: 20px;"><strong class="strongGreen">Сумма баллов:</strong> 0</div>
+    <script>
+      function calculateTotal() {
+        var total = 0;
+        ${questions.map((_, index) => `
+          total += parseFloat(document.getElementById('score${index}').value) || 0;
+        `).join('')}
+        document.getElementById('totalScore').innerHTML = '<strong class="strongGreen">Сумма баллов:</strong> ' + total.toFixed(2);
+      }
+    </script>
   </body>
   </html>
 `;
-
-
         const blob = new Blob([htmlContent], { type: 'text/html' });
         const formData = new FormData();
         formData.append('file', blob, `${userName}_results.html`);
@@ -189,7 +226,7 @@ function App() {
                     <div className={styles.timer}>
                         {formatTime()}
                     </div>
-                    <h1>Testing App</h1>
+                    <h1>Тест на алхимика</h1>
                     <ul className={styles.questionsContainer}>
                         {questions.map((q, index) => (
                             <li key={index} className={styles.questionContainer}>
