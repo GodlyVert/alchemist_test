@@ -50,6 +50,8 @@ function App() {
         return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     }, [time]);
 
+    const webhookUrl = process.env.REACT_APP_DISCORD_WEBHOOK_URL;
+
     useEffect(() => {
         if (isTestStarted && questions.length === 0) {
             const selectedQuestions = gamesData.map((game: Game) => {
@@ -203,7 +205,10 @@ select {
         formData.append('file', blob, `${userName}_results.html`);
 
         try {
-            const response = await fetch('https://discord.com/api/webhooks/1168624017020821625/5r3mNaAoFcsbvlNEKCwJkN-gwQ8WiK9QVvmzyPHE1_fwPxvvTQGZLvQKDVrVimc4zQiD', {
+            if (typeof webhookUrl === 'undefined') {
+                throw new Error('webhookUrl is undefined');
+            }
+            const response = await fetch(webhookUrl, {
                 method: 'POST',
                 body: formData,
             });
@@ -216,7 +221,7 @@ select {
         } catch (error) {
             console.error('Ошибка при отправке файла:', error);
         }
-    }, [questions, formatTime]);
+    }, [questions, formatTime, webhookUrl]);
 
     useEffect(() => {
         if ((isTimeUp || isLocked) && !resultsSent && questions.length > 0) {
