@@ -4,13 +4,45 @@ import { Game, Question } from './types';
 import styles from './App.module.css';
 
 function App() {
-    const [questions, setQuestions] = useState<Question[]>([]);
-    const [time, setTime] = useState<number>(17 * 60); // 17 минут в секундах
-    const [isTimeUp, setIsTimeUp] = useState<boolean>(false);
-    const [isLocked, setIsLocked] = useState<boolean>(false);
-    const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
-    const [userName, setUserName] = useState<string>('');
-    const [isTestStarted, setIsTestStarted] = useState<boolean>(false);
+    const [questions, setQuestions] = useState<Question[]>(() => {
+        const savedState = localStorage.getItem('appState');
+        return savedState ? JSON.parse(savedState).questions : [];
+    });
+
+    const [time, setTime] = useState<number>(() => {
+        const savedState = localStorage.getItem('appState');
+        return savedState ? JSON.parse(savedState).time : 17 * 60;
+    });
+
+    const [isTimeUp, setIsTimeUp] = useState<boolean>(() => {
+        const savedState = localStorage.getItem('appState');
+        return savedState ? JSON.parse(savedState).isTimeUp : false;
+    });
+
+    const [isLocked, setIsLocked] = useState<boolean>(() => {
+        const savedState = localStorage.getItem('appState');
+        return savedState ? JSON.parse(savedState).isLocked : false;
+    });
+
+    const [isTimerRunning, setIsTimerRunning] = useState<boolean>(() => {
+        const savedState = localStorage.getItem('appState');
+        return savedState ? JSON.parse(savedState).isTimerRunning : false;
+    });
+
+    const [userName, setUserName] = useState<string>(() => {
+        const savedState = localStorage.getItem('appState');
+        return savedState ? JSON.parse(savedState).userName : '';
+    });
+
+    const [isTestStarted, setIsTestStarted] = useState<boolean>(() => {
+        const savedState = localStorage.getItem('appState');
+        return savedState ? JSON.parse(savedState).isTestStarted : false;
+    });
+
+    const [resultsSent, setResultsSent] = useState<boolean>(() => {
+        const savedState = localStorage.getItem('appState');
+        return savedState ? JSON.parse(savedState).resultsSent : false;
+    });
 
     const formatTime = useCallback(() => {
         const minutes = Math.floor(time / 60);
@@ -19,7 +51,7 @@ function App() {
     }, [time]);
 
     useEffect(() => {
-        if (isTestStarted) {
+        if (isTestStarted && questions.length === 0) {
             const selectedQuestions = gamesData.map((game: Game) => {
                 const randomIndex = Math.floor(Math.random() * game.questions.length);
                 return {
@@ -32,9 +64,7 @@ function App() {
             setQuestions(selectedQuestions);
             setIsTimerRunning(true);
         }
-    }, [isTestStarted]);
-
-
+    }, [isTestStarted, questions.length]);
 
     useEffect(() => {
         if (!isTimerRunning) return;
@@ -55,17 +85,6 @@ function App() {
         return () => clearInterval(timerId);
     }, [isTimerRunning]);
 
-    useEffect(() => {
-        if (isTimeUp || isLocked) {
-            const results = {
-                userName,
-                remainingTime: formatTime(),
-                answers: questions
-            };
-            localStorage.setItem('testResults', JSON.stringify(results));
-        }
-    }, [isTimeUp, isLocked, userName, questions, formatTime]);
-
     const handleStartTest = () => {
         setIsTestStarted(true);
     };
@@ -74,7 +93,6 @@ function App() {
         setIsLocked(true);
         setIsTimeUp(true);
         setIsTimerRunning(false);
-        saveResultsAsHTML(userName);
     };
 
     const handleAnswerChange = (index: number, answer: string) => {
@@ -83,7 +101,7 @@ function App() {
         setQuestions(updatedQuestions);
     };
 
-    const saveResultsAsHTML = async (userName: string) => {
+    const saveResultsAsHTML = useCallback(async (userName: string) => {
         const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400&display=swap');
   body {
@@ -198,7 +216,36 @@ select {
         } catch (error) {
             console.error('Ошибка при отправке файла:', error);
         }
-    };
+    }, [questions, formatTime]);
+
+    useEffect(() => {
+        if ((isTimeUp || isLocked) && !resultsSent && questions.length > 0) {
+            const results = {
+                userName,
+                remainingTime: formatTime(),
+                answers: questions
+            };
+            localStorage.setItem('testResults', JSON.stringify(results));
+            saveResultsAsHTML(userName)
+                .then(() => setResultsSent(true))
+                .catch((error) => console.error('Ошибка при отправке результатов:', error));
+        }
+    }, [isTimeUp, isLocked, userName, questions, formatTime, resultsSent, saveResultsAsHTML]);
+
+
+    useEffect(() => {
+        const state = {
+            questions,
+            time,
+            isTimeUp,
+            isLocked,
+            isTimerRunning,
+            userName,
+            isTestStarted,
+            resultsSent,
+        };
+        localStorage.setItem('appState', JSON.stringify(state));
+    }, [questions, time, isTimeUp, isLocked, isTimerRunning, userName, isTestStarted, resultsSent]);
 
 
     return (
