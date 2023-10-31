@@ -44,6 +44,17 @@ function App() {
         return savedState ? JSON.parse(savedState).resultsSent : false;
     });
 
+    const [isNameValid, setIsNameValid] = useState<boolean>(true);
+
+    const handleUserNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const name = e.target.value;
+        const isValid = /^[A-Za-z]+$/.test(name);
+        setIsNameValid(isValid);
+        if (isValid || name === "") {
+            setUserName(name);
+        }
+    };
+
     const formatTime = useCallback(() => {
         const minutes = Math.floor(time / 60);
         const seconds = time % 60;
@@ -338,14 +349,20 @@ p {
                     <div className={styles.modalContent}>
                         <input
                             type="text"
-                            placeholder="Введите ваше имя"
+                            placeholder="Введите никнейм Discord, только английский"
                             value={userName}
                             onChange={(e) => setUserName(e.target.value)}
+                            pattern="[A-Za-z0-9]+"
                         />
+                        {!/^[A-Za-z0-9]+$/.test(userName) && userName.length > 0 && (
+                            <div className={styles.warning}>
+                                Никнейм может содержать только английские буквы и цифры
+                            </div>
+                        )}
                         <button
                             className={`${styles.startButton}`}
                             onClick={handleStartTest}
-                            disabled={!userName}
+                            disabled={!userName || !/^[A-Za-z0-9]+$/.test(userName)}
                         >
                             Начать тест
                         </button>

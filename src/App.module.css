@@ -147,6 +147,11 @@ input:focus {
     background-color: #45a049;
 }
 
+.startButton:disabled {
+    background-color: #cccccc; /* Или другой оттенок серого цвета */
+    cursor: not-allowed;
+}
+
 .questionsContainer {
     align-self: flex-start;
     width: 100%;
@@ -166,4 +171,13 @@ input:focus {
     text-align: center;
     border: 1px solid #ccc;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    width: 400px;
+}
+
+.warning {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 14px; /* размер шрифта */
+    color: #333; /* цвет текста */
+    word-wrap: break-word; /* перенос слов на новую строку */
+    max-width: 400px;
 }
