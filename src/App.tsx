@@ -105,100 +105,178 @@ function App() {
 
     const saveResultsAsHTML = useCallback(async (userName: string) => {
         const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400&display=swap');
-  body {
-    font-family: 'Roboto Mono', monospace;
-    padding: 20px;
-    margin: 0;
-    color: black;
-    text-align: center;
-  }
-   .question-block {
-    text-align: left;
-  }
-  h1 {
-    font-size: 2em;
-    margin-bottom: 20px;
-  }
-  .info, .info div {
-    margin-bottom: 20px;
-  }
-  .info strong, li strong {
-    color: #4CAF50;
-  }
-  ul {
-    list-style: none;
-    padding: 0;
-    max-width: 600px;
-    width: 100%;
-    margin: 0 auto;
-  }
-  li {
-    margin-bottom: 10px;
-  }
-  p {
-    font-family: 'Roboto Mono', monospace;
-    margin: 0;
-  }
-  .strongGreen {
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400&display=swap');
+body {
+  font-family: 'Roboto Mono', monospace;
+  padding: 20px;
+  margin: 0;
+  color: black;
+  text-align: center;
+}
+.question-block {
+  text-align: left;
+}
+h1 {
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+.info, .info div {
+  margin-bottom: 20px;
+}
+.info strong, li strong {
   color: #4CAF50;
 }
-select {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  font-family: 'Roboto Mono', monospace;
+ul {
+  list-style: none;
+  padding: 0;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
 }
-
+li {
+  margin-bottom: 10px;
+}
+p {
+  font-family: 'Roboto Mono', monospace;
+  margin: 0;
+}
+.strongGreen {
+  color: #4CAF50;
+}
+.radio-group {
+  margin-top: 10px;
+}
+.custom-radio {
+  display: inline-block;
+}
+.custom-radio input[type="radio"] {
+  display: none;
+}
+.custom-radio label {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  position: relative;
+  margin: 0 3px;
+  cursor: pointer;
+}
+.custom-radio label span {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.3s ease;
+  background-color: #fff;
+}
+.custom-radio input[type="radio"]:checked + label span {
+  transform: translate(-50%, -50%) scale(1);
+}
+.red label {
+  background: #e74c3c;
+}
+.light-red label {
+  background: #e7827e;
+}
+.yellow label {
+  background: #f1c40f;
+}
+.light-green label {
+  background: #b3d98e;
+}
+.green label {
+  background: #2ecc71;
+}
+.line {
+  border-top: 2px solid #351723;
+  margin-top: 10px;
+  width: 100%;
+}
 `;
 
+
         const htmlContent = `
-  <html lang="ru">
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Результаты Теста</title>
-    <style>${styles}</style>
-  </head>
-  <body>
-    <h1>Результаты Теста</h1>
-    <div class="info">
-      <div><strong>Имя:</strong> ${userName}</div>
-      <div><strong>Оставшееся время:</strong> ${formatTime()}</div>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Результаты Теста</title>
+  <style>${styles}</style>
+</head>
+<body>
+  <h1>Результаты Теста</h1>
+  <div class="info">
+    <div><strong>Имя:</strong> ${userName}</div>
+    <div><strong>Оставшееся время:</strong> ${formatTime()}</div>
+  </div>
+  <ul>
+   ${questions.map((q, index) => `
+  <li class="question-block">
+    <div>
+      <strong class="strongGreen">${q.game}:</strong> ${q.question}
     </div>
-    <ul>
-      ${questions.map((q, index) => `
-        <li class="question-block">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <strong class="strongGreen">${q.game}:</strong> ${q.question}
-            </div>
-            <select id="score${index}" onchange="calculateTotal()">
-              <option value="0">0</option>
-              <option value="0.5">0,5</option>
-              <option value="0.75">0,75</option>
-              <option value="1">1</option>
-            </select>
-          </div>
-          <p><strong class="strongGreen">Ответ:</strong> ${q.answer}</p>
-          <p><strong class="strongGreen">Правильный ответ:</strong> ${q.correctAnswer}</p>
-        </li>
-      `).join('')}
-    </ul>
-    <div id="totalScore" style="margin-top: 20px;"><strong class="strongGreen">Сумма баллов:</strong> 0</div>
-    <script>
+    <p><strong class="strongGreen">Ответ:</strong> ${q.answer}</p>
+    <p><strong class="strongGreen">Правильный ответ:</strong> ${q.correctAnswer}</p>
+    <div class="radio-group" id="score${index}">
+      <div class="custom-radio red">
+        <input type="radio" id="score${index}-0" name="score${index}" value="0">
+        <label for="score${index}-0"><span></span></label>
+      </div>
+      <div class="custom-radio light-red">
+        <input type="radio" id="score${index}-0.25" name="score${index}" value="0.25">
+        <label for="score${index}-0.25"><span></span></label>
+      </div>
+      <div class="custom-radio yellow">
+        <input type="radio" id="score${index}-0.5" name="score${index}" value="0.5">
+        <label for="score${index}-0.5"><span></span></label>
+      </div>
+      <div class="custom-radio light-green">
+        <input type="radio" id="score${index}-0.75" name="score${index}" value="0.75">
+        <label for="score${index}-0.75"><span></span></label>
+      </div>
+      <div class="custom-radio green">
+        <input type="radio" id="score${index}-1" name="score${index}" value="1">
+        <label for="score${index}-1"><span></span></label>
+      </div>
+    </div>
+    <div class="line"></div>
+  </li>
+`).join('')}
+
+  </ul>
+  <div id="totalScore" style="margin-top: 20px;"><strong class="strongGreen">Сумма баллов:</strong> 0</div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const container = document.body;
+      container.addEventListener('change', (event) => {
+        if (event.target.closest('.radio-group')) {
+          calculateTotal();
+        }
+      });
+
       function calculateTotal() {
         var total = 0;
+        var radios;
         ${questions.map((_, index) => `
-          total += parseFloat(document.getElementById('score${index}').value) || 0;
+          radios = document.getElementsByName('score${index}');
+          for (const radio of radios) {
+            if (radio.checked) {
+              total += parseFloat(radio.value);
+              break;
+            }
+          }
         `).join('')}
         document.getElementById('totalScore').innerHTML = '<strong class="strongGreen">Сумма баллов:</strong> ' + total.toFixed(2);
-      }
-    </script>
-  </body>
-  </html>
+      };
+    });
+  </script>
+</body>
+</html>
 `;
         const blob = new Blob([htmlContent], { type: 'text/html' });
         const formData = new FormData();
