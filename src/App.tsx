@@ -238,18 +238,18 @@ p {
         <input type="radio" id="score${index}-0" name="score${index}" value="0">
         <label for="score${index}-0"><span></span></label>
       </div>
-      <div class="custom-radio light-red">
+      <!--<div class="custom-radio light-red">
         <input type="radio" id="score${index}-0.25" name="score${index}" value="0.25">
         <label for="score${index}-0.25"><span></span></label>
-      </div>
+      </div>-->
       <div class="custom-radio yellow">
         <input type="radio" id="score${index}-0.5" name="score${index}" value="0.5">
         <label for="score${index}-0.5"><span></span></label>
       </div>
-      <div class="custom-radio light-green">
+      <!--<div class="custom-radio light-green">
         <input type="radio" id="score${index}-0.75" name="score${index}" value="0.75">
         <label for="score${index}-0.75"><span></span></label>
-      </div>
+      </div>-->
       <div class="custom-radio green">
         <input type="radio" id="score${index}-1" name="score${index}" value="1">
         <label for="score${index}-1"><span></span></label>
