@@ -46,6 +46,7 @@
   },
   "devDependencies": {
     "@types/react": "^18.2.36",
+    "@types/testing-library__react": "^10.2.0",
     "gh-pages": "^6.0.0"
   }
 }
